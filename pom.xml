@@ -11,6 +11,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.cucumber.reporting.version>5.7.5</maven.cucumber.reporting.version>
+        <cucumber.version>7.11.2</cucumber.version>
     </properties>
 
     <dependencyManagement>
@@ -18,7 +20,7 @@
             <dependency>
                 <groupId>io.cucumber</groupId>
                 <artifactId>cucumber-bom</artifactId>
-                <version>7.11.2</version>
+                <version>${cucumber.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -35,13 +37,31 @@
     <dependencies>
         <dependency>
             <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-core</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.cucumber/cucumber-junit -->
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit</artifactId>
+            <version>${cucumber.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-junit-platform-engine</artifactId>
+            <version>${cucumber.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -56,6 +76,15 @@
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/net.masterthought/cucumber-reporting -->
+        <dependency>
+            <groupId>net.masterthought</groupId>
+            <artifactId>cucumber-reporting</artifactId>
+            <version>${maven.cucumber.reporting.version}</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>
@@ -69,12 +98,53 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>execution</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/RunCucumberTest.class</include>
+                            </includes>
+                            <testFailureIgnore>true</testFailureIgnore>
+                        </configuration>
+                    </execution>
+            </executions>
             </plugin>
+
+            <plugin>
+            <groupId>net.masterthought</groupId>
+            <artifactId>maven-cucumber-reporting</artifactId>
+            <version>${maven.cucumber.reporting.version}</version>
+            <executions>
+                <execution>
+                    <id>execution</id>
+                    <phase>test</phase>
+                    <goals>
+                        <goal>generate</goal>
+                    </goals>
+                    <configuration>
+                        <projectName>Cucumber Reporting Example</projectName>
+                        <jsonFiles>
+                            <param>**/*.json</param>
+                        </jsonFiles>
+                        <outputDirectory>${project.build.directory}/cucumber-reports</outputDirectory>
+                        <inputDirectory>${project.build.directory}</inputDirectory>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+
+
         </plugins>
     </build>
 </project>
