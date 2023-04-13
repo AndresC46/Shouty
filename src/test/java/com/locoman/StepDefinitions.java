@@ -47,6 +47,12 @@ public class StepDefinitions {
         }
     }
 
+    @Given("{string} has bought {int} credits")
+    public void seanHasBoughtCredits(String name, int credits) {
+        network.AddToNetwork(name);
+        network.setupCreditsForAccount(name, credits);
+    }
+
     @When("{string} shouts {string}")
     public void shouts(String name, String message) {
         lastShout = message;
@@ -75,4 +81,8 @@ public class StepDefinitions {
     }
 
 
+    @Then("{string} should have {int} credits")
+    public void shouldHaveCredits(String name, int expectedCreditBalance) {
+            assertEquals(expectedCreditBalance, network.getUserCredits(name));
+    }
 }

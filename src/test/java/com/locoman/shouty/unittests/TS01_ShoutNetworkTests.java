@@ -16,7 +16,6 @@ public class TS01_ShoutNetworkTests {
 
     @BeforeEach
     public void setup(){
-        System.out.println("Setting up test");
         network = new ShoutyNetwork();
     }
 

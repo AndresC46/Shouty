@@ -1,10 +1,18 @@
 package com.locoman.shouty;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+/**
+ * This is Network Class for the Shouty BDD Demo Project
+ * from IO Cucumber School
+ */
 public class ShoutyNetwork {
     final static int MAX_MESSAGE = 180;
+    public static final Pattern BUY_PATTERN = Pattern.compile("buy", Pattern.CASE_INSENSITIVE);
     int shoutRange = 100;
+
     Boolean inRange = true;
     HashMap<String, Person> people = new HashMap<>();
 
@@ -30,6 +38,14 @@ public class ShoutyNetwork {
     public void setInRange(Boolean inRange) { this.inRange = inRange; }
 
     /**
+     * Add a new Person to a Shouty Network with default range
+     * @param name Name of person
+     */
+    public void AddToNetwork(String name){
+        people.put(name, new Person(name.toLowerCase(Locale.ROOT), MAX_MESSAGE));
+    }
+
+    /**
      * Add a new Person to a Shouty Network
      * @param name      Name of person
      * @param distance  Distance form Shout
@@ -44,11 +60,13 @@ public class ShoutyNetwork {
      * @param message shouted
      */
     public void Shout(String name, String message) {
-        people.forEach( (key, value) -> {
-            if(wasShoutHeardBy(key, message)){
-                people.put(key, people.get(key)).shout(message);
-            }
-        });
+        if (enoughCreditsForShout(name, message)) {
+            people.forEach((key, value) -> {
+                if (wasShoutHeardBy(key, message)) {
+                    people.put(key, people.get(key)).shout(message);
+                }
+            });
+        }
     }
 
     /**
@@ -74,8 +92,9 @@ public class ShoutyNetwork {
      * @return true if shout is valid, false otherwise
      */
     public boolean wasShoutHeardBy(String name, String message) {
-        return (isWithinRange(name) && isMessageWithValidSize(message));
+        return ( isWithinRange(name) && isMessageWithValidSize(message) );
     }
+
 
     /**
      * Verifies that a  message  is that Max message size
@@ -86,21 +105,22 @@ public class ShoutyNetwork {
         return message.length() <= MAX_MESSAGE;
     }
 
+    /**
+     * Check if user is within shouting range
+     * @param name of user
+     * @return true if within range, false otherwise
+     */
     private boolean isWithinRange(String name) {
         return ( getShoutRange() >= getPersonDistance(name) );
     }
 
-
-
-
-
     /**
      * Return list of Shouts heard by Person
-     * @param name person
-     * @returnList of Shouts heard
+     * @param name of person
+     * @return list of SHouts heard
      */
     public List<List<String>> getMessagesHeard(String name) {
-        List<List<String>> actualMessages = new ArrayList<List<String>>();
+        List<List<String>> actualMessages = new ArrayList<>();
         List<String> heard = people.get(name).getMessagesHeard();
         for(String message : heard){
             actualMessages.add(Collections.singletonList(message));
@@ -108,6 +128,61 @@ public class ShoutyNetwork {
         return actualMessages;
     }
 
+    /**
+     * Setup Person with a credit amount
+     * @param name of Shouty account user
+     * @param creditAmount amount of credit to give user
+     */
+    public void setupCreditsForAccount(String name, int creditAmount) {
+        people.get(name).setCredits(creditAmount);
+    }
+
+    /**
+     * Return Person's current credit amount
+     * @param name of Shouty account user
+     * @return  current credit amount
+     */
+    public int getUserCredits(String name) {
+        return people.get(name).getCredits();
+    }
+
+    /**
+     * Check if User has enough credit to cover shout and deduct if amount covers
+     * @param name of user
+     * @param message shout
+     * @return true if user has enough balance and charge is successful, false otherwise
+     */
+    public boolean enoughCreditsForShout(String name, String message) {
+        boolean enoughCredits = false;
+        int chargeAmt = shoutCharge(message);
+        int creditAmt = people.get(name).getCredits();
+         if(creditAmt >= chargeAmt){
+             people.get(name).setCredits(creditAmt - chargeAmt);  // Update balance with charges
+             enoughCredits = true;
+         }
+        return enoughCredits;
+    }
 
 
-}
+    /**
+     * Calculate Shout Charge
+     * @param message Shouted message
+     * @return charge for shout
+     */
+    public int shoutCharge(String message ) {
+        int charge = 0;
+
+        if (!isMessageWithValidSize(message)) {
+            charge = 2;
+        }
+
+        // Check if buy message is in Shout
+        Matcher matcher = BUY_PATTERN.matcher(message);
+        while(matcher.find()) {
+            charge += 5;
+        }
+
+        return charge;
+    }
+
+} // end class
