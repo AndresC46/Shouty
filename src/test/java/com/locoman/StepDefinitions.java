@@ -14,20 +14,21 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class StepDefinitions {
-    private ShoutyNetwork network;
-    private static final int DEFAULT_RANGE = 100;
+    private final ShoutyNetwork network;
     String lastShout = "";
 
     @Before
     public void createNetwork() {
-        network = new ShoutyNetwork();
-        network.setShoutRange(DEFAULT_RANGE);
         lastShout = "";
     }
 
     @DataTableType
     public WhereAbouts defineWhereAbouts(Map<String, String> entry) {
         return new WhereAbouts(entry.get("name"), Integer.parseInt(entry.get("location")));
+    }
+
+    public StepDefinitions(ShoutyNetwork network) {
+        this.network = network;
     }
 
     @Given("shout range is {int} metres")

@@ -6,7 +6,7 @@
 
     <groupId>com.locoman</groupId>
     <artifactId>shouty</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -83,6 +83,15 @@
             <artifactId>cucumber-reporting</artifactId>
             <version>${maven.cucumber.reporting.version}</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.cucumber/cucumber-picocontainer -->
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-picocontainer</artifactId>
+            <version>7.11.2</version>
+            <scope>test</scope>
+        </dependency>
+
 
 
     </dependencies>

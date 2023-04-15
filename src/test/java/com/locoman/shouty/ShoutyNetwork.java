@@ -10,9 +10,9 @@ import java.util.regex.Pattern;
  */
 public class ShoutyNetwork {
     final static int MAX_MESSAGE = 180;
+    final static int SHOUT_RANGE = 100;
     public static final Pattern BUY_PATTERN = Pattern.compile("buy", Pattern.CASE_INSENSITIVE);
-    int shoutRange = 100;
-
+    int shoutRange = SHOUT_RANGE;
     Boolean inRange = true;
     HashMap<String, Person> people = new HashMap<>();
 
@@ -22,9 +22,28 @@ public class ShoutyNetwork {
     public ShoutyNetwork(){
     }
 
-    // Setters and Getters
+    //
+    //   Setters and Getters for Class
+    //
     public int getShoutRange() { return this.shoutRange; }
     public void setShoutRange(int shoutRange) { this.shoutRange = shoutRange; }
+
+    /**
+     * Return Person's current credit amount
+     * @param name of Shouty account user
+     * @return  current credit amount
+     */
+    public int getUserCredits(String name) {
+        return people.get(name).getCredits();
+    }
+
+    /**
+     * Get number of People in Network
+     * @return number of people in network
+     */
+    public int getPeopleCount() {
+        return people.size();
+    }
 
     /**
      * Determine if Shout listener is in range of Shouter
@@ -35,7 +54,6 @@ public class ShoutyNetwork {
         this.inRange = (shoutRange >= rangeDistance);
         return inRange;
     }
-    public void setInRange(Boolean inRange) { this.inRange = inRange; }
 
     /**
      * Add a new Person to a Shouty Network with default range
@@ -55,7 +73,8 @@ public class ShoutyNetwork {
     }
 
     /**
-     * A Shout is sent
+     * A Shout is sent, checked for balance and
+     * associated with in range hearers
      * @param name of the shouter
      * @param message shouted
      */
@@ -69,13 +88,6 @@ public class ShoutyNetwork {
         }
     }
 
-    /**
-     * Get number of People in Network
-     * @return number of people in network
-     */
-    public int getPeopleCount() {
-        return people.size();
-    }
 
     /**
      * Get Person's distance from Shout
@@ -114,6 +126,7 @@ public class ShoutyNetwork {
         return ( getShoutRange() >= getPersonDistance(name) );
     }
 
+
     /**
      * Return list of Shouts heard by Person
      * @param name of person
@@ -128,6 +141,7 @@ public class ShoutyNetwork {
         return actualMessages;
     }
 
+
     /**
      * Setup Person with a credit amount
      * @param name of Shouty account user
@@ -137,14 +151,6 @@ public class ShoutyNetwork {
         people.get(name).setCredits(creditAmount);
     }
 
-    /**
-     * Return Person's current credit amount
-     * @param name of Shouty account user
-     * @return  current credit amount
-     */
-    public int getUserCredits(String name) {
-        return people.get(name).getCredits();
-    }
 
     /**
      * Check if User has enough credit to cover shout and deduct if amount covers
@@ -165,7 +171,11 @@ public class ShoutyNetwork {
 
 
     /**
-     * Calculate Shout Charge
+     * Calculate Shout Charge according to these rules:
+     *    Check if buy message is in Shout, Charge 5 credits once if word 'buy' is used
+     *    If word 'buy' is repeated in message charge once
+     *    Check if message is within allowed size, Charge 2 credits to send
+     *
      * @param message Shouted message
      * @return charge for shout
      */
@@ -176,9 +186,9 @@ public class ShoutyNetwork {
             charge = 2;
         }
 
-        // Check if buy message is in Shout
         Matcher matcher = BUY_PATTERN.matcher(message);
-        while(matcher.find()) {
+        // If we use a while here it will charge each time the word buy is mentioned
+        if(matcher.find()) {
             charge += 5;
         }
 
