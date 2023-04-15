@@ -9,18 +9,21 @@ public class Person {
     String lastShoutedMessage;
     String lastHeardMessage;
     String name;
+    Integer credits;    // Shout Credits amount
 
 
     public Person(String name) {
         distanceFromShout = 0;
         lastShoutedMessage = "";
         lastHeardMessage = "";
+        credits = 0;
         this.name = name;
     }
 
     public Person(String name, int range) {
         distanceFromShout = range;
         lastShoutedMessage = "";
+        credits = 0;
         this.name = name;
     }
 
@@ -37,11 +40,23 @@ public class Person {
     public List<String> getMessagesHeard() { return messages; }
     public void setResult(List<String> message) { this.messages = messages; }
 
+    public Integer getCredits() { return credits; }
+    public void setCredits(Integer credits) { this.credits = credits; }
 
     public void shout(String message) {
         setLastShoutedMessage(message);
         messages.add(getLastShoutedMessage());
     }
 
+    public boolean deductCreditsFromPerson(int creditCharge){
+        boolean creditDeductSuccess = false;
+        int availableCredits = getCredits();
+
+        if(creditCharge < availableCredits) {
+            setCredits(availableCredits - creditCharge);
+        }
+
+        return creditDeductSuccess;
+    }
 
 }
